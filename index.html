@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>جدول صيانة Elantra AD</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #c0392b; --dark: #1a1a1a; --gray: #2d2d2d;
+    --text: #f0f0f0; --muted: #999; --green: #27ae60;
+    --yellow: #f39c12; --card-bg: #242424; --blue: #3498db;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Cairo', sans-serif; background: var(--dark); color: var(--text); min-height: 100vh; padding: 20px; direction: rtl; }
+
+  header { text-align: center; padding: 30px 0 20px; border-bottom: 3px solid var(--red); margin-bottom: 24px; position: relative; }
+  header::before { content: ''; position: absolute; bottom: -3px; left: 50%; transform: translateX(-50%); width: 80px; height: 3px; background: #fff; }
+  .brand { font-size: 13px; letter-spacing: 4px; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
+  h1 { font-size: 2.2rem; font-weight: 900; color: var(--red); line-height: 1; margin-bottom: 4px; }
+  .subtitle { font-size: 0.85rem; color: var(--muted); }
+
+  .car-info-box { background: var(--card-bg); border: 1px solid #383838; border-radius: 12px; padding: 20px; margin-bottom: 24px; }
+  .box-title { font-size: 0.7rem; letter-spacing: 3px; color: var(--red); text-transform: uppercase; padding-right: 10px; border-right: 3px solid var(--red); margin-bottom: 14px; }
+  .input-group { display: flex; flex-direction: column; gap: 6px; }
+  .input-group label { font-size: 0.75rem; color: var(--muted); }
+  .input-group input { background: #1a1a1a; border: 1px solid #444; border-radius: 8px; padding: 10px 12px; color: var(--text); font-family: 'Cairo', sans-serif; font-size: 0.85rem; outline: none; transition: border-color 0.2s; direction: ltr; text-align: right; }
+  .input-group input:focus { border-color: var(--red); }
+  .car-status { display: none; background: #1a1a1a; border-radius: 8px; padding: 12px 16px; font-size: 0.8rem; color: var(--muted); line-height: 1.8; border: 1px solid #333; margin-top: 14px; }
+  .car-status.visible { display: block; }
+  .car-status strong { color: var(--text); }
+
+  .km-selector { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 24px; }
+  .km-btn { background: var(--gray); border: 1px solid #444; color: var(--muted); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-family: 'Cairo', sans-serif; font-size: 0.8rem; font-weight: 600; transition: all 0.2s; }
+  .km-btn:hover { border-color: var(--red); color: var(--text); }
+  .km-btn.active { background: var(--red); border-color: var(--red); color: #fff; box-shadow: 0 0 12px rgba(192,57,43,0.4); }
+
+  .km-progress { margin-bottom: 24px; }
+  .km-label { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--muted); margin-bottom: 8px; }
+  .progress-track { height: 4px; background: #333; border-radius: 2px; overflow: visible; position: relative; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--green), var(--red)); border-radius: 2px; transition: width 0.5s ease; }
+  .progress-thumb { position: absolute; top: 50%; transform: translate(-50%, -50%); width: 12px; height: 12px; background: #fff; border-radius: 50%; border: 2px solid var(--red); transition: left 0.5s ease; box-shadow: 0 0 8px rgba(192,57,43,0.6); }
+
+  .legend { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px; padding: 14px; background: var(--card-bg); border-radius: 10px; border: 1px solid #383838; }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; color: var(--muted); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+
+  .summary { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; justify-content: center; }
+  .sum-chip { padding: 6px 16px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+  .sum-chip .num { font-size: 1.1rem; font-weight: 900; }
+  .chip-r { background: rgba(39,174,96,0.15); color: #2ecc71; border: 1px solid rgba(39,174,96,0.3); }
+  .chip-i { background: rgba(52,152,219,0.15); color: #3498db; border: 1px solid rgba(52,152,219,0.3); }
+  .chip-t { background: rgba(155,89,182,0.15); color: #9b59b6; border: 1px solid rgba(155,89,182,0.3); }
+  .chip-s { background: rgba(243,156,18,0.15); color: #f39c12; border: 1px solid rgba(243,156,18,0.3); }
+
+  .section-title { font-size: 0.7rem; letter-spacing: 3px; color: var(--red); text-transform: uppercase; margin: 24px 0 12px; padding-right: 12px; border-right: 3px solid var(--red); }
+
+  .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .card { background: var(--card-bg); border: 1px solid #383838; border-radius: 10px; padding: 16px; display: flex; align-items: flex-start; gap: 14px; transition: all 0.2s; opacity: 0; animation: fadeIn 0.4s forwards; }
+  .card:hover { border-color: var(--red); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+  .card.time-due { border-color: var(--yellow) !important; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .card-icon { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+  .icon-r { background: rgba(39,174,96,0.15); }
+  .icon-i { background: rgba(52,152,219,0.15); }
+  .icon-t { background: rgba(155,89,182,0.15); }
+  .icon-special { background: rgba(243,156,18,0.15); }
+  .card-body { flex: 1; }
+  .card-title { font-size: 0.82rem; font-weight: 700; color: var(--text); line-height: 1.4; margin-bottom: 4px; }
+  .card-sub { font-size: 0.72rem; color: var(--muted); line-height: 1.4; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: 700; margin-top: 6px; margin-left: 4px; }
+  .badge-r { background: rgba(39,174,96,0.2); color: #2ecc71; }
+  .badge-i { background: rgba(52,152,219,0.2); color: #3498db; }
+  .badge-t { background: rgba(155,89,182,0.2); color: #9b59b6; }
+  .badge-special { background: rgba(243,156,18,0.2); color: #f39c12; }
+  .badge-warn { background: rgba(243,156,18,0.3); color: #f39c12; border: 1px solid rgba(243,156,18,0.5); }
+  .badge-ok { background: rgba(39,174,96,0.2); color: #2ecc71; }
+  .badge-overdue { background: rgba(192,57,43,0.3); color: #e74c3c; border: 1px solid rgba(192,57,43,0.5); }
+  .badge-done { background: rgba(39,174,96,0.2); color: #2ecc71; border: 1px solid rgba(39,174,96,0.4); }
+
+  .btn-done { margin-top: 10px; display: inline-flex; align-items: center; gap: 6px; background: rgba(39,174,96,0.1); border: 1px solid rgba(39,174,96,0.35); color: #2ecc71; border-radius: 6px; padding: 5px 12px; font-family: 'Cairo', sans-serif; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+  .btn-done:hover { background: rgba(39,174,96,0.25); }
+  .btn-undo { margin-top: 4px; display: inline-flex; align-items: center; gap: 4px; background: none; border: none; color: #666; font-family: 'Cairo', sans-serif; font-size: 0.68rem; cursor: pointer; text-decoration: underline; padding: 0; }
+  .btn-undo:hover { color: #999; }
+
+  .empty { text-align: center; padding: 60px 20px; color: var(--muted); }
+  .empty .big { font-size: 3rem; }
+  .empty p { margin-top: 10px; font-size: 0.9rem; }
+
+  footer { text-align: center; margin-top: 40px; font-size: 0.7rem; color: #555; padding-bottom: 20px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">Hyundai</div>
+  <h1>جدول الصيانة</h1>
+  <div class="subtitle">Elantra AD — اختر الكيلومتر تشوف إيه اللي هتعمله</div>
+</header>
+
+<div class="car-info-box">
+  <div class="box-title">بيانات سيارتك</div>
+  <div class="input-group">
+    <label>📅 تاريخ الشراء</label>
+    <input type="date" id="purchaseDate" value="2025-09-25" oninput="updateCarStatus()">
+  </div>
+  <div class="car-status" id="carStatus"></div>
+</div>
+
+<div class="km-selector" id="kmSelector"></div>
+
+<div class="km-progress">
+  <div class="km-label">
+    <span>0 KM</span>
+    <span id="currentKmLabel">اختر موعد الصيانة</span>
+    <span>200,000 KM</span>
+  </div>
+  <div class="progress-track">
+    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    <div class="progress-thumb" id="progressThumb" style="left:0%"></div>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#2ecc71"></div> R = استبدال</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#3498db"></div> I = فحص</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#9b59b6"></div> T = شد / ربط</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#f39c12"></div> دوري = حسب المدة أو الكيلومتر</div>
+</div>
+
+<div id="summary" class="summary" style="display:none"></div>
+<div id="content">
+  <div class="empty"><div class="big">🔧</div><p>اختر موعد الصيانة من الأعلى</p></div>
+</div>
+
+<footer>
+  Elantra AD Maintenance Schedule • بناءً على الدليل الرسمي
+  <br><br>
+  <button onclick="downloadPage()" style="background:var(--red);border:none;color:#fff;padding:10px 24px;border-radius:8px;font-family:'Cairo',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;">⬇️ تحميل الصفحة</button>
+</footer>
+
+<script>
+// ─── KM Steps (every 10k up to 200k) ─────────────────────────────────────────
+const KM_STEPS = [];
+for (let km = 10000; km <= 200000; km += 10000) {
+  KM_STEPS.push({ label: (km/1000) + ',000 KM', km, month: Math.round(km / 10000 * 12) });
+}
+// Insert 1k at start
+KM_STEPS.unshift({ label: '1,000 KM', km: 1000, month: 12 });
+
+// ─── Special items meta ───────────────────────────────────────────────────────
+const SPECIAL_META = {
+  'coolant':  { everyMonths: 24,  everyKm: 40000,  label: 'كل 40,000 KM أو 24 شهر (أيهما أسبق)' },
+  'valve':    { everyMonths: 48,  everyKm: 100000, label: 'فحص كل 100,000 KM أو 48 شهر (أيهما أسبق)' },
+  'brake_f':  { everyMonths: 36, everyKm: 60000,  label: 'فحص في كل صيانة، استبدال كل 3 سنوات أو 60,000 KM' },
+  'body':     { everyMonths: 12,  everyKm: null,   label: 'فحص سنوي' },
+  'trans':    { everyMonths: null,everyKm: 100000, label: 'كل 100,000 KM' },
+  'belt_r':   { everyMonths: null,everyKm: 60000,  label: 'استبدال كل 60,000 KM' },
+  'bolts':    { everyMonths: null,everyKm: 40000,  label: 'كل 40,000 KM' },
+};
+
+// ─── Items ────────────────────────────────────────────────────────────────────
+// [ar, en, icon, type, stepsOrKey, metaKey]
+// type: 'special' | 'R' | 'I' | 'T' | 'mixed'
+// For R/I/T: stepsOrKey = function(km) => bool
+// For mixed: stepsOrKey = { R: fn, I: fn }
+
+const every = (n) => (km) => km > 0 && km % n === 0;
+const at    = (...kms) => (km) => kms.includes(km);
+const from  = (start, n) => (km) => km >= start && (km - start) % n === 0;
+
+// Air filter: per schedule - I:10k, I:20k(actually R at 20k), R:20k,40k,60k,80k,100k — I: 10k,30k,50k,70k,90k
+const airFilterR = (km) => [20000,40000,60000,80000,100000,120000,140000,160000,180000,200000].includes(km);
+const airFilterI = (km) => [10000,30000,50000,70000,90000,110000,130000,150000,170000,190000].includes(km);
+
+// Fuel filter: I at 20k, R at 40k, I at 60k, R at 80k, I at 100k... pattern: R every 40k starting 40k, I at midpoints
+const fuelFilterR = (km) => km >= 40000 && (km - 40000) % 40000 === 0;
+const fuelFilterI = (km) => km >= 20000 && (km - 20000) % 40000 === 0;
+
+// Spark plugs: R at 40k, 80k only (first 100k per schedule)
+const sparkR = (km) => [40000, 80000, 120000, 160000, 200000].includes(km);
+
+// Drive belt: I every 10k, R at 60k,120k,180k
+const beltR = (km) => km >= 60000 && km % 60000 === 0;
+const beltI = (km) => km >= 10000 && km % 10000 === 0 && !beltR(km);
+
+// Fuel system: every 40k
+const fuelSysI = (km) => km >= 10000 && km % 40000 === 0;
+
+// Vacuum hose: every 20k
+const vacI = (km) => km >= 10000 && km % 20000 === 0;
+
+// Vapor hose: every 40k
+const vaporI = (km) => km >= 10000 && km % 40000 === 0;
+
+// Exhaust: every 20k
+const exhaustI = (km) => km >= 10000 && km % 20000 === 0;
+
+// Driveshaft boots: every 20k
+const bootsI = (km) => km >= 10000 && km % 20000 === 0;
+
+// Brake fluid: I every maintenance, R at 60k,120k,180k (every 3 yrs or 60k)
+const brakeFR = (km) => km >= 60000 && km % 60000 === 0;
+const brakeHoseI = (km) => km >= 10000 && km % 10000 === 0;
+
+// AC filter: per schedule - R at 30k,60k,90k — I otherwise every 10k from 1k
+const acFilterR = (km) => km >= 30000 && km % 30000 === 0;
+const acFilterI = (km) => (km === 1000 || km >= 10000) && km % 10000 === 0 && !acFilterR(km);
+
+// Tire rotation: per schedule - Rotate at 10k,20k,30k then R(balance) at 40k, Rotate 50k,60k,70k, R at 80k...
+// Shown as: Rotate=I, R=R in the schedule
+const rotationR = (km) => km >= 40000 && km % 40000 === 0;
+const rotationI = (km) => km >= 10000 && km % 10000 === 0 && !rotationR(km);
+
+const ALL_ITEMS = [
+  // ENGINE
+  ['تغيير زيت المحرك + فلتر الزيت',                   'Engine Oil & Filter Change',                   '🛢️',  'R',       (km) => km === 1000 || (km >= 10000 && km % 10000 === 0), null],
+  ['فلتر الهواء',                                       'Air Filter',                                   '🌬️', 'mixed',   { R: airFilterR, I: airFilterI }, null],
+  ['فلتر الوقود',                                       'Fuel Filter',                                  '⛽',  'mixed',   { R: fuelFilterR, I: fuelFilterI }, null],
+  ['البوجيهات',                                         'Spark Plugs',                                  '⚡',  'R',       sparkR, null],
+  ['فحص عمل مروحة التبريد',                            'Check Cooling Fan Operation',                  '💨',  'I',       every(10000), null],
+  ['فحص منظومة العادم بجهاز تشخيص الأعطال',           'Check Engine Emission (Scan Tool)',             '💻',  'I',       every(10000), null],
+  ['فحص منظومة التبريد (ريدياتير، خراطيم، وصلات)',    'Inspect Cooling System (Radiator, Hoses)',      '🌡️', 'I',       every(10000), null],
+  ['تغيير سائل التبريد',                               'Replace Engine Coolant',                       '🔵',  'special', 'coolant', 'coolant'],
+  ['فحص / استبدال سير المجموعة',                       'Drive Belt Inspect / Replace',                 '🔄',  'mixed',   { R: beltR, I: beltI }, null],
+  ['فحص خلوص الصبابات',                                'Engine Valve Clearance',                       '🔩',  'special', 'valve',   'valve'],
+  ['فحص منظومة الوقود (تانك، خراطيم، وصلات)',         'Inspect Fuel System (Tank, Pipes)',             '🪣',  'I',       fuelSysI, null],
+  ['فحص خرطوم الفاكيوم',                               'Inspect Vacuum Hose',                          '🔗',  'I',       vacI, null],
+  ['فحص خرطوم بخار الوقود وغطاء التانك',              'Inspect Vapor Hose & Fuel Filler Cap',         '🧪',  'I',       vaporI, null],
+  ['فحص منظومة العادم',                                'Inspect Exhaust System',                       '💨',  'I',       exhaustI, null],
+  // POWERTRAIN
+  ['فحص كاوتش الكوبلن',                                'Inspect Driveshaft Dust Boots',                '⚙️',  'I',       bootsI, null],
+  ['تغيير زيت الفيتس الأوتوماتيك',                    'Change A/T Fluid',                             '🔃',  'special', 'trans',   'trans'],
+  // BRAKES
+  ['فحص وضبط فرامل اليد',                             'Inspect & Adjust Parking Brake',               '🛑',  'I',       every(10000), null],
+  ['زيت الفرامل',                                      'Brake & Clutch Fluid',                         '🚿',  'special', 'brake_f', 'brake_f'],
+  ['فحص التيل والطنابير',                              'Inspect Disc Brakes & Pads',                   '🔴',  'I',       every(10000), null],
+  ['فحص خراطيم وخطوط زيت الفرامل',                   'Inspect Brake Hoses & Lines',                  '🔧',  'I',       brakeHoseI, null],
+  // AC
+  ['فحص عمل التكييف',                                  'Inspect AC System Operation',                  '❄️',  'I',       every(10000), null],
+  ['فحص وتنظيف فلتر التكييف',                         'Inspect & Clean A/C Filter',                   '🌀',  'mixed',   { R: acFilterR, I: acFilterI }, null],
+  // ELECTRICAL
+  ['فحص البطارية',                                     'Inspect Battery',                              '🔋',  'I',       every(10000), null],
+  ['فحص عمل المساحات',                                 'Check Windshield Wipers',                      '🌧️', 'I',       every(10000), null],
+  ['فحص جميع الأنوار وفتحة السقف',                    'Inspect All Lights & Sunroof',                 '💡',  'I',       (km) => km === 1000 || (km >= 10000 && km % 10000 === 0), null],
+  ['فحص عمل الكلاكس',                                 'Inspect Horn Operation',                       '📯',  'I',       (km) => km === 1000 || (km >= 10000 && km % 10000 === 0), null],
+  ['فحص عمل المساحات',                                'Check Windshield Wipers',                      '🌧️', 'I',       (km) => km === 1000 || (km >= 10000 && km % 10000 === 0), null],
+  // CHASSIS
+  ['فحص ضغط وحالة الإطارات',                          'Inspect Tires Pressure & Tread Wear',          '🔵',  'I',       every(10000), null],
+  ['فحص منظومة التوجيه',                               'Inspect Steering Rack & Linkage',              '🎯',  'I',       every(10000), null],
+  ['ربط مسامير وصواميل العفشة',                       'Tighten Body Bolts & Nuts',                    '🔩',  'special', 'bolts',   'bolts'],
+  ['تبديل الإطارات',                                   'Tire Rotation',                                '🔁',  'mixed',   { R: rotationR, I: rotationI }, null],
+  ['فحص قاع السيارة (صدأ، تآكل، ثقوب)',               'Body Condition (Rust, Corrosion)',              '🚗',  'special', 'body',    'body'],
+  ['فحص وصلات العفشة الأمامية',                        'Inspect Front Suspension Ball Joints',         '🏎️', 'I',       every(10000), null],
+];
+
+// Section grouping
+const SECTIONS = [
+  { title: '🔴 استبدال (Replace)',  types: ['R'] },
+  { title: '🔵 فحص (Inspect)',      types: ['I'] },
+  { title: '🟣 شد / ربط (Tighten)', types: ['T'] },
+  { title: '⏰ صيانة دورية',        types: ['special'] },
+];
+
+// ─── Done Records ─────────────────────────────────────────────────────────────
+let doneRecords = {};
+try { doneRecords = JSON.parse(localStorage.getItem('elantra_done_v2') || '{}'); } catch(e) {}
+function saveDone() { try { localStorage.setItem('elantra_done_v2', JSON.stringify(doneRecords)); } catch(e) {} }
+function markDone(key, atKm) {
+  if (!doneRecords[key]) doneRecords[key] = [];
+  if (!doneRecords[key].includes(atKm)) doneRecords[key].push(atKm);
+  saveDone(); if (selectedStep !== null) selectStep(selectedStep);
+}
+function undoDone(key, atKm) {
+  if (doneRecords[key]) doneRecords[key] = doneRecords[key].filter(k => k !== atKm);
+  saveDone(); if (selectedStep !== null) selectStep(selectedStep);
+}
+
+function getNextDueKm(metaKey) {
+  const meta = SPECIAL_META[metaKey];
+  if (!meta || !meta.everyKm) return null;
+  const done = doneRecords[metaKey] || [];
+  if (!done.length) return meta.everyKm;
+  return Math.max(...done) + meta.everyKm;
+}
+function getNextDueMonths(metaKey) {
+  const meta = SPECIAL_META[metaKey];
+  if (!meta || !meta.everyMonths) return null;
+  const timesCompleted = (doneRecords[metaKey] || []).length;
+  return (timesCompleted + 1) * meta.everyMonths;
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function getMonthsSince(dateStr) {
+  if (!dateStr) return null;
+  const p = new Date(dateStr), now = new Date();
+  return (now.getFullYear() - p.getFullYear()) * 12 + (now.getMonth() - p.getMonth());
+}
+function getCarInfo() {
+  const dateStr = document.getElementById('purchaseDate').value;
+  return { dateStr, months: getMonthsSince(dateStr) };
+}
+
+function checkSpecialDue(metaKey, stepKm) {
+  const { months } = getCarInfo();
+  const meta = SPECIAL_META[metaKey];
+  if (!meta) return null;
+  const doneAtThis = (doneRecords[metaKey] || []).includes(stepKm);
+  if (doneAtThis) return { status: 'done', nextDueKm: getNextDueKm(metaKey) };
+  const nextKm = getNextDueKm(metaKey);
+  const nextMo = getNextDueMonths(metaKey);
+  const kmDue   = nextKm && stepKm >= nextKm;
+  const timeDue = nextMo && months !== null && months >= nextMo;
+  if (months === null) return { status: 'unknown', nextDueKm: nextKm };
+  if (kmDue || timeDue) return { status: 'due', nextDueKm: nextKm };
+  const pctKm = nextKm ? stepKm / nextKm : 0;
+  const pctMo = (nextMo && months) ? months / nextMo : 0;
+  if (Math.max(pctKm, pctMo) >= 0.75) return { status: 'soon', nextDueKm: nextKm };
+  return { status: 'ok', nextDueKm: nextKm };
+}
+
+// ─── Car Status ───────────────────────────────────────────────────────────────
+function updateCarStatus() {
+  const { dateStr, months } = getCarInfo();
+  const el = document.getElementById('carStatus');
+  if (!dateStr) { el.classList.remove('visible'); return; }
+  let html = months !== null
+    ? `عمر السيارة: <strong>${months} شهر</strong> (${Math.floor(months/12)} سنة و ${months%12} شهر)`
+    : '';
+  const alerts = [];
+  for (const [key, meta] of Object.entries(SPECIAL_META)) {
+    if (!meta.everyMonths) continue;
+    const nextMo = getNextDueMonths(key);
+    if (months >= nextMo) {
+      const names = { coolant:'سائل التبريد', valve:'خلوص الصبابات', body:'فحص قاع السيارة' };
+      if (names[key]) alerts.push(`<span style="color:#e74c3c">⚠️ ${names[key]}: حان وقتها!</span>`);
+    }
+  }
+  if (alerts.length) html += '<br>' + alerts.join(' &nbsp;•&nbsp; ');
+  el.innerHTML = html;
+  el.classList.add('visible');
+  if (selectedStep !== null) selectStep(selectedStep);
+}
+
+// ─── Get items for a KM step ──────────────────────────────────────────────────
+function getItemsForStep(stepKm) {
+  const out = { R: [], I: [], T: [], special: [] };
+  ALL_ITEMS.forEach(([ar, en, icon, type, data, metaKey]) => {
+    if (type === 'R') {
+      if (data(stepKm)) out.R.push({ ar, en, icon, badge: 'R', badgeText: 'استبدال' });
+    } else if (type === 'I') {
+      if (data(stepKm)) out.I.push({ ar, en, icon, badge: 'I', badgeText: 'فحص' });
+    } else if (type === 'T') {
+      if (data(stepKm)) out.T.push({ ar, en, icon, badge: 'T', badgeText: 'شد / ربط' });
+    } else if (type === 'mixed') {
+      if (data.R && data.R(stepKm)) out.R.push({ ar, en, icon, badge: 'R', badgeText: 'استبدال' });
+      else if (data.I && data.I(stepKm)) out.I.push({ ar, en, icon, badge: 'I', badgeText: 'فحص' });
+    } else if (type === 'special') {
+      const check = checkSpecialDue(data, stepKm);
+      out.special.push({ ar, en, icon, metaKey: data, note: SPECIAL_META[data]?.label || '', timeCheck: check, stepKm });
+    }
+  });
+  return out;
+}
+
+// ─── Render ───────────────────────────────────────────────────────────────────
+function renderCard(item, type, i) {
+  const delay = i * 0.04;
+  if (type === 'special') {
+    const tc = item.timeCheck;
+    let statusBadge = '', actionBtn = '', cardClass = 'card';
+    if (tc) {
+      if (tc.status === 'done') {
+        statusBadge = `<span class="badge badge-done">✅ تم عند ${item.stepKm.toLocaleString()} KM</span>`;
+        if (tc.nextDueKm) statusBadge += ` <span class="badge" style="background:#333;color:#888">الجاية: ${tc.nextDueKm.toLocaleString()} KM</span>`;
+        actionBtn = `<br><button class="btn-undo" onclick="undoDone('${item.metaKey}',${item.stepKm})">↩ تراجع</button>`;
+      } else if (tc.status === 'due') {
+        statusBadge = `<span class="badge badge-overdue">⚠️ حان وقتها!</span>`;
+        actionBtn = `<br><button class="btn-done" onclick="markDone('${item.metaKey}',${item.stepKm})">✅ تم عملها في الصيانة دي</button>`;
+        cardClass = 'card time-due';
+      } else if (tc.status === 'soon') {
+        statusBadge = `<span class="badge badge-warn">🔶 قريباً</span>`;
+      } else if (tc.status === 'ok') {
+        statusBadge = `<span class="badge badge-ok">✅ لسه بدري</span>`;
+      }
+    }
+    return `<div class="${cardClass}" style="animation-delay:${delay}s">
+      <div class="card-icon icon-special">${item.icon}</div>
+      <div class="card-body">
+        <div class="card-title">${item.ar}</div>
+        <div class="card-sub">${item.en}</div>
+        <span class="badge badge-special">⏰ ${item.note}</span> ${statusBadge}${actionBtn}
+      </div></div>`;
+  }
+  const iconClass  = type === 'T' ? 'icon-t'  : type === 'R' ? 'icon-r' : 'icon-i';
+  const badgeClass = type === 'T' ? 'badge-t' : type === 'R' ? 'badge-r' : 'badge-i';
+  return `<div class="card" style="animation-delay:${delay}s">
+    <div class="card-icon ${iconClass}">${item.icon}</div>
+    <div class="card-body">
+      <div class="card-title">${item.ar}</div>
+      <div class="card-sub">${item.en}</div>
+      <span class="badge ${badgeClass}">${item.badgeText}</span>
+    </div></div>`;
+}
+
+// ─── Select Step ──────────────────────────────────────────────────────────────
+let selectedStep = null;
+function selectStep(idx) {
+  selectedStep = idx;
+  document.querySelectorAll('.km-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
+  const step = KM_STEPS[idx];
+  const pct = (step.km / 200000) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressThumb').style.left = pct + '%';
+  document.getElementById('currentKmLabel').textContent = step.label + ' / شهر ' + step.month;
+
+  const items = getItemsForStep(step.km);
+  const total = items.R.length + items.I.length + items.T.length + items.special.length;
+
+  const sumEl = document.getElementById('summary');
+  sumEl.style.display = 'flex';
+  sumEl.innerHTML = `
+    <div class="sum-chip chip-r"><span class="num">${items.R.length}</span> استبدال</div>
+    <div class="sum-chip chip-i"><span class="num">${items.I.length}</span> فحص</div>
+    <div class="sum-chip chip-s"><span class="num">${items.special.length}</span> دوري</div>
+    <div class="sum-chip" style="background:#333;color:#aaa;border:1px solid #444"><span class="num">${total}</span> إجمالي</div>`;
+
+  let html = '';
+  if (items.R.length)       html += `<div class="section-title">🔴 استبدال (Replace)</div><div class="cards-grid">${items.R.map((it,i)=>renderCard(it,'R',i)).join('')}</div>`;
+  if (items.I.length)       html += `<div class="section-title">🔵 فحص (Inspect)</div><div class="cards-grid">${items.I.map((it,i)=>renderCard(it,'I',i)).join('')}</div>`;
+  if (items.T.length)       html += `<div class="section-title">🟣 شد / ربط (Tighten)</div><div class="cards-grid">${items.T.map((it,i)=>renderCard(it,'T',i)).join('')}</div>`;
+  if (items.special.length) html += `<div class="section-title">⏰ صيانة دورية</div><div class="cards-grid">${items.special.map((it,i)=>renderCard(it,'special',i)).join('')}</div>`;
+
+  document.getElementById('content').innerHTML = html || '<div class="empty"><div class="big">✅</div><p>لا توجد صيانة في هذا الموعد</p></div>';
+}
+
+// ─── Build Buttons ────────────────────────────────────────────────────────────
+const selector = document.getElementById('kmSelector');
+KM_STEPS.forEach((step, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'km-btn';
+  btn.textContent = step.label;
+  btn.onclick = () => selectStep(i);
+  selector.appendChild(btn);
+});
+
+function downloadPage() {
+  const blob = new Blob([document.documentElement.outerHTML], { type: 'text/html' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'elantra-maintenance.html';
+  a.click();
+}
+
+updateCarStatus();
+</script>
+</body>
+</html>
